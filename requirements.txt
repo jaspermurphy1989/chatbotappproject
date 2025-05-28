@@ -4,3 +4,4 @@ langchain>=0.1.0
 faiss-cpu
 python-dotenv
 requests
+langgraph
