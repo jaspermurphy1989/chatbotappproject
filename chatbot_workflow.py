@@ -1,9 +1,10 @@
 from langgraph.graph import StateGraph
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.chat_models import ChatOpenAI
+from langchain_community.vectorstores import FAISS  # FAISS moved here
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI  # New import path
 from langchain.chains import RetrievalQA
-from langchain.schema.runnable import RunnableLambda
+from langchain_core.runnables import RunnableLambda  # Moved to langchain_core
+
+# Rest of your code remains the same...
 
 vectorstore = FAISS.load_local("vectorstore", OpenAIEmbeddings())
 retriever = vectorstore.as_retriever()
