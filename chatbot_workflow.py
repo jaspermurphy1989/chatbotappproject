@@ -1,7 +1,6 @@
 from langgraph.graph import StateGraph
 from langchain.vectorstores import FAISS
 from langchain_community.vectorstores.faiss import FAISS
-# Use this import (modern approach):
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI  # New import path
 from langchain.chains import RetrievalQA
