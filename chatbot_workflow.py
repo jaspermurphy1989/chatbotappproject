@@ -1,5 +1,7 @@
 from langgraph.graph import StateGraph
-from langchain_community.vectorstores import FAISS  # FAISS moved here
+from langchain.vectorstores import FAISS
+from langchain_community.vectorstores.faiss import FAISS
+#from langchain_community.vectorstores import FAISS  # FAISS moved here
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI  # New import path
 from langchain.chains import RetrievalQA
 from langchain_core.runnables import RunnableLambda  # Moved to langchain_core
