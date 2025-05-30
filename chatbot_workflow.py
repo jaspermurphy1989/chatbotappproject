@@ -1,8 +1,10 @@
 from langgraph.graph import StateGraph
-from langchain_community.vectorstores import FAISS  # Correct modern import
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI #Updated modern imports (replace old ones if any)
 from langchain.chains import RetrievalQA
 from langchain_core.runnables import RunnableLambda
+from langchain_community.vectorstores import FAISS
+from langchain_core.embeddings import Embeddings
+
 
 # Initialize components
 def initialize_components():
