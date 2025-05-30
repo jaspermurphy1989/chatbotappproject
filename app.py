@@ -32,7 +32,7 @@ user_input = st.text_input("Ask our Expert about our Splan Products:")
 if st.button("Submit"):
     if user_input:
         st.info("Generating your answer, please wait...")
-        time.sleep(2)
+        time.sleep(3)
         response = app.invoke({"question": user_input})
         answer = response["answer"]
         st.write("Answer:")
