@@ -9,4 +9,5 @@ faiss-cpu
 python-dotenv
 requests
 tiktoken
+tenacity
 
