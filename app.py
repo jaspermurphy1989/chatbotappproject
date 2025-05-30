@@ -24,8 +24,10 @@ if "ip_address" not in st.session_state:
     except:
         st.session_state.ip_address = "Unknown"
 
-st.title("Splan Chatbot Project 🤖")
-st.markdown("👋 Welcome! How can I assist you today?")
+with st.chat_message("assistant"):
+    st.write("👋 Hello! I'm your Splan Product Assistant 🤖")
+    st.write("I'm here to help you with any questions about our products and services.")
+    st.write("How may I assist you today?")
 
 user_input = st.text_input("Ask our Expert about our Splan Products:")
 
