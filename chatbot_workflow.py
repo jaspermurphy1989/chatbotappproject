@@ -1,5 +1,6 @@
 from langgraph.graph import StateGraph
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI #Updated modern imports (replace old ones if any)
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain_core.runnables import RunnableLambda
 from langchain_community.vectorstores import FAISS
