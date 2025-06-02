@@ -5,17 +5,29 @@ from langchain.chains import RetrievalQA
 from langchain_core.runnables import RunnableLambda
 from langchain_community.vectorstores import FAISS
 from langchain_core.embeddings import Embeddings
+from langchain_community.vectorstores import Chroma
 
 
-# Initialize components
+try:
+    from langchain_community.vectorstores import FAISS
+    USE_FAISS = True
+except ImportError as e:
+    warnings.warn(f"FAISS not available, falling back to Chroma: {str(e)}")
+    from langchain_community.vectorstores import Chroma
+    USE_FAISS = False
+
+# Initialize components with fallback
 def initialize_components():
     embeddings = OpenAIEmbeddings()
     
-    # Load vectorstore with error handling
+    # Load vectorstore with error handling and fallback
     try:
-        vectorstore = FAISS.load_local("vectorstore", embeddings)
+        if USE_FAISS:
+            vectorstore = FAISS.load_local("vectorstore", embeddings)
+        else:
+            vectorstore = Chroma(persist_directory="chroma_db", embedding_function=embeddings)
     except Exception as e:
-        raise RuntimeError(f"Failed to load vectorstore: {str(e)}")
+        raise RuntimeError(f"Failed to load vectorstore: {str(e)}. Please ensure the vector store is properly initialized.")
     
     retriever = vectorstore.as_retriever()
     llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
@@ -24,9 +36,10 @@ def initialize_components():
     rag_chain = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=retriever,
-        return_source_documents=True  # Optional: include source documents
+        return_source_documents=True
     )
     return rag_chain
+
 
 # Initialize components once
 rag_chain = initialize_components()
