@@ -8,3 +8,5 @@ python-dotenv>=1.0.0
 requests>=2.31.0
 tiktoken>=0.5.1
 tenacity>=8.2.3
+chromadb>=0.4.0  # 👈 Add this line
+rich>=10.14.0
