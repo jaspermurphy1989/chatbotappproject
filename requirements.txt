@@ -1,13 +1,15 @@
-streamlit>=1.30.0
-openai>=1.3.5
-langchain-community==0.0.29  # Critical - replaces generic langchain
-langchain-openai==0.0.8    # Required for OpenAI integrations
-langchain==0.0.330
-langgraph==0.0.13
-faiss-cpu==1.7.4            # Pinned version for stability
-python-dotenv>=1.0.0
-requests>=2.31.0
-tiktoken>=0.5.1
-tenacity>=8.2.3
-chromadb>=0.4.0  # 👈 Add this line
-rich>=10.14.0
+streamlit==1.32.0
+openai==1.12.0
+langchain-core==0.1.53
+langchain-community==0.0.29
+langchain-openai==0.1.0
+langchain==0.1.14  # Newer version without the conflict
+faiss-cpu==1.7.4
+python-dotenv==1.0.0
+tiktoken==0.6.0
+requests==2.32.3
+tenacity==8.2.3
+chromadb==0.4.22  # More stable version
+rich==13.7.1
+PyYAML==6.0.2
+numpy==1.26.4
