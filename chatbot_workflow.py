@@ -1,10 +1,14 @@
 import pickle
 import numpy as np
 from typing import Optional, Dict, Any, Tuple
+from enum import Enum, auto
+
+# Stable, non-conflicting imports
 from langchain_core.embeddings import Embeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import TextLoader, DirectoryLoader
-from enum import Enum, auto
+from langchain.document_loaders import TextLoader, DirectoryLoader
+from langchain.vectorstores import FAISS, Chroma
+from langchain_openai import OpenAIEmbeddings
 
 class VectorStoreType(Enum):
     FAISS = auto()
@@ -16,11 +20,11 @@ class VectorStoreConfig:
         self.CHUNK_SIZE = 1000
         self.CHUNK_OVERLAP = 200
         
-        # FAISS-specific config
+        # FAISS-specific
         self.FAISS_INDEX_NAME = "my_faiss_index"
         self.FAISS_PKL_NAME = "my_faiss_index.pkl"
         
-        # Chroma-specific config
+        # Chroma-specific
         self.CHROMA_PERSIST_DIR = "chroma_db"
         self.CHROMA_COLLECTION_NAME = "my_chroma_collection"
 
@@ -41,19 +45,17 @@ class VectorStoreManager:
             )
             return text_splitter.split_documents(documents)
         except Exception as e:
-            raise RuntimeError(f"Failed to process documents: {str(e)}")
+            raise RuntimeError(f"Document processing failed: {str(e)}")
     
     def create_vector_store(self, documents, embeddings: Embeddings) -> Tuple[Any, Dict]:
-        """Create and save vector store based on selected type"""
+        """Create vector store based on selected type"""
         if self.store_type == VectorStoreType.FAISS:
             return self._create_faiss_store(documents, embeddings)
-        else:
-            return self._create_chroma_store(documents, embeddings)
+        return self._create_chroma_store(documents, embeddings)
     
     def _create_faiss_store(self, documents, embeddings: Embeddings) -> Tuple[Any, Dict]:
-        """Create and save FAISS index"""
+        """Create FAISS index"""
         try:
-            from langchain_community.vectorstores import FAISS
             db = FAISS.from_documents(documents, embeddings)
             db.save_local(self.config.FAISS_INDEX_NAME)
             
@@ -69,15 +71,12 @@ class VectorStoreManager:
                 pickle.dump(metadata, f)
             
             return db, metadata
-        except ImportError:
-            raise ImportError("FAISS not available. Install with: pip install faiss-cpu")
         except Exception as e:
-            raise RuntimeError(f"Failed to create FAISS store: {str(e)}")
-    
+            raise RuntimeError(f"FAISS store creation failed: {str(e)}")
+
     def _create_chroma_store(self, documents, embeddings: Embeddings) -> Tuple[Any, Dict]:
-        """Create and save ChromaDB index"""
+        """Create ChromaDB index"""
         try:
-            from langchain_community.vectorstores import Chroma
             db = Chroma.from_documents(
                 documents=documents,
                 embedding=embeddings,
@@ -88,30 +87,25 @@ class VectorStoreManager:
             metadata = {
                 "store_type": "Chroma",
                 "chunk_size": self.config.CHUNK_SIZE,
-                "chunk_overlap": self.config.CHROMA_OVERLAP,
+                "chunk_overlap": self.config.CHUNK_OVERLAP,
                 "document_count": len(documents),
                 "embedding_model": str(embeddings.model),
                 "collection_name": self.config.CHROMA_COLLECTION_NAME
             }
             
-            # Chroma automatically persists to disk
             return db, metadata
-        except ImportError:
-            raise ImportError("Chroma not available. Install with: pip install chromadb")
         except Exception as e:
-            raise RuntimeError(f"Failed to create Chroma store: {str(e)}")
+            raise RuntimeError(f"Chroma store creation failed: {str(e)}")
     
     def load_vector_store(self, embeddings: Embeddings) -> Tuple[Optional[Any], Optional[Dict]]:
-        """Load existing vector store based on selected type"""
+        """Load existing vector store"""
         if self.store_type == VectorStoreType.FAISS:
             return self._load_faiss_store(embeddings)
-        else:
-            return self._load_chroma_store(embeddings)
+        return self._load_chroma_store(embeddings)
     
     def _load_faiss_store(self, embeddings: Embeddings) -> Tuple[Optional[Any], Optional[Dict]]:
-        """Load existing FAISS index"""
+        """Load FAISS index"""
         try:
-            from langchain_community.vectorstores import FAISS
             db = FAISS.load_local(
                 self.config.FAISS_INDEX_NAME,
                 embeddings,
@@ -126,21 +120,18 @@ class VectorStoreManager:
                 print("Warning: Metadata file not found")
                 return db, None
         except Exception as e:
-            print(f"Failed to load FAISS index: {str(e)}")
+            print(f"FAISS load error: {str(e)}")
             return None, None
     
     def _load_chroma_store(self, embeddings: Embeddings) -> Tuple[Optional[Any], Optional[Dict]]:
-        """Load existing ChromaDB index"""
+        """Load ChromaDB index"""
         try:
-            from langchain_community.vectorstores import Chroma
             db = Chroma(
                 persist_directory=self.config.CHROMA_PERSIST_DIR,
                 embedding_function=embeddings,
                 collection_name=self.config.CHROMA_COLLECTION_NAME
             )
             
-            # Chroma doesn't have a direct metadata file like FAISS,
-            # but we can get some info from the collection
             metadata = {
                 "store_type": "Chroma",
                 "collection_name": self.config.CHROMA_COLLECTION_NAME,
@@ -149,47 +140,37 @@ class VectorStoreManager:
             
             return db, metadata
         except Exception as e:
-            print(f"Failed to load Chroma index: {str(e)}")
+            print(f"Chroma load error: {str(e)}")
             return None, None
 
 if __name__ == "__main__":
-    # Configuration
+    # Example usage
     config = VectorStoreConfig()
+    manager = VectorStoreManager(config, VectorStoreType.CHROMA)
     
-    # Choose your vector store type here
-    store_type = VectorStoreType.CHROMA  # or VectorStoreType.FAISS
-    
-    # Initialize manager
-    manager = VectorStoreManager(config, store_type)
-    
-    # Initialize embeddings
-    from langchain_openai import OpenAIEmbeddings
     embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    
-    # Path to your documents
     DATA_PATH = "./data"
     
-    # Create or load index
     db, metadata = manager.load_vector_store(embeddings)
     
     if db is None:
-        print(f"Creating new {store_type.name} vector store...")
+        print(f"Creating new {manager.store_type.name} vector store...")
         try:
             documents = manager.process_documents(DATA_PATH)
             db, metadata = manager.create_vector_store(documents, embeddings)
-            print(f"Created new {store_type.name} index with {len(documents)} documents")
+            print(f"Created index with {len(documents)} documents")
         except Exception as e:
-            print(f"Failed to create index: {str(e)}")
+            print(f"Creation failed: {str(e)}")
             exit(1)
     else:
-        print(f"Loaded existing {store_type.name} index")
+        print(f"Loaded existing index")
         if metadata:
             print(f"Metadata: {metadata}")
     
     # Example search
     query = "What are Splan products?"
     results = db.similarity_search(query, k=3)
-    print(f"\nSearch results for '{query}':")
+    print(f"\nResults for '{query}':")
     for i, doc in enumerate(results):
         print(f"\nResult {i+1}:")
-        print(doc.page_content[:200] + "...")  # Show preview
+        print(doc.page_content[:200] + "...")
