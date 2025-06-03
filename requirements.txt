@@ -1,7 +1,8 @@
 streamlit>=1.30.0
 openai>=1.3.5
 langchain-community==0.0.29  # Critical - replaces generic langchain
-langchain-openai==0.0.8     # Required for OpenAI integrations
+langchain-openai==0.0.8    # Required for OpenAI integrations
+langchain==0.0.330
 langgraph==0.0.13
 faiss-cpu==1.7.4            # Pinned version for stability
 python-dotenv>=1.0.0
