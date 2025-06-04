@@ -2,7 +2,7 @@ import pickle
 from typing import Optional, Dict, Any, Tuple, List
 from enum import Enum, auto
 from langchain_core.embeddings import Embeddings
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader, DirectoryLoader
 from langchain.vectorstores import FAISS, Chroma
 from langchain_openai import OpenAIEmbeddings
