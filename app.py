@@ -1,12 +1,10 @@
 import streamlit as st
 import datetime
 import requests
+import time
 from chatbot_workflow import app
-from openai import OpenAI, RateLimitError
+from openai import RateLimitError
 from tenacity import retry, stop_after_attempt, wait_exponential
-
-# Initialize OpenAI client
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # Initialize session state variables
 if "chat_history" not in st.session_state:
