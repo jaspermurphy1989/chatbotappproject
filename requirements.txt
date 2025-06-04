@@ -1,7 +1,17 @@
-langchain-core==0.1.53
-langchain-openai==0.1.0
-openai==1.12.0
+# Core
 streamlit==1.32.0
-faiss-cpu==1.7.4
-chromadb==0.4.24
+python-dotenv==1.0.0
+
+# AI
+openai==1.12.0
 tiktoken==0.6.0
+
+# LangChain (LOCKED VERSIONS)
+langchain-core==0.1.53  # Critical - must stay at 0.1.53
+langchain==0.1.14       # Matches core 0.1.53
+langchain-openai==0.0.8 # Compatible with above
+langchain-text-splitters==0.0.1
+
+# VectorDB
+faiss-cpu==1.7.4
+chromadb==0.4.22
